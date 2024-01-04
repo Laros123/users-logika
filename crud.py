@@ -1,19 +1,18 @@
+from sqlalchemy.orm import Session
+import models
 
 
 def get_user_by_id(db, user_id):
-    for user in db:
-        if user['id'] == user_id:
-            return user
-    return None
+    return db.query(models.User).filter(models.User.id == user_id).first()
 
 
 def get_all_users(db):
-    return db
+    return db.query(models.User).all()
 
 
 def create_user(db, user):
-    if db:
-        user_id = db[-1]['id']+1
-    else:
-        user_id = 1
-    db.append({'id': user_id, 'username': user.username, 'email': user.email})
+    db_user = models.User(username=user.username, email=user.email)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
